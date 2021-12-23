@@ -1,7 +1,11 @@
-sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
+const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
   const previousFields = [];
   const changedFields = [];
   const generalSettingConfigs = [];
+  const isValidParamsSettings = (params, settingName) => {
+    params = Number(params);
+    if (isNaN(params)) throw new Error(`ERR_INVALID_${settingName}`);
+  };
   [
     "OFFLINE_MODEM_DELETE_CYCLE",
     "HISTORY_DELETE_CYCLE",
@@ -59,9 +63,7 @@ sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
         case "TOLLERENCE":
         case "CMTR_CORR":
         case "NMTR_CORR": {
-          params[settingName] = Number(params[settingName]);
-          if (isNaN(params[settingName]))
-            throw new Error(`ERR_INVALID_${settingName}`);
+          isValidParamsSettings(params[settingName], settingName);
           break;
         }
         case "DISABLE_NOTIFICATION_VAL":
