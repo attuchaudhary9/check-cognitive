@@ -99,15 +99,7 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
 
           break;
         }
-        case "MAX_usrxpwr": {
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !(params[settingName] >= -1000 && params[settingName] <= 1000)
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
-          break;
-        }
+        case "MAX_usrxpwr":
         case "MIN_usrxpwr": {
           params[settingName] = Number(params[settingName]);
           if (
