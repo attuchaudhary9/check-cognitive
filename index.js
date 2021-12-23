@@ -4,6 +4,7 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
   const generalSettingConfigs = [];
   const isValidParamsSettings = (params, settingName) => {
     params = Number(params);
+    console.log("PARAMS", params);
     if (isNaN(params)) throw new Error(`ERR_INVALID_${settingName}`);
   };
   [
@@ -98,6 +99,15 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
 
           break;
         }
+        case "MAX_usrxpwr": {
+          params[settingName] = Number(params[settingName]);
+          if (
+            isNaN(params[settingName]) ||
+            !(params[settingName] >= -1000 && params[settingName] <= 1000)
+          )
+            throw new Error(`ERR_INVALID_${settingName}`);
+          break;
+        }
         case "MIN_usrxpwr": {
           params[settingName] = Number(params[settingName]);
           if (
@@ -171,6 +181,4 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
       }
     }
   });
-
-  return [generalSettingConfigs, previousFields, changedFields];
 };
