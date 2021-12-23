@@ -1,22 +1,7 @@
-const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
+ConfigHelper.sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
   const previousFields = [];
   const changedFields = [];
   const generalSettingConfigs = [];
-  const isValidParamsSettings = (params, settingName) => {
-    params[settingName] = Number(params[settingName]);
-    const isNaNCheck = isNaN(params[settingName]);
-
-    switch (params[settingName]) {
-      case isNaNCheck:
-        throw new Error(`ERR_INVALID_${settingName}`);
-      case !(params[settingName] === 1):
-        throw new Error(`ERR_INVALID_${settingName}`);
-      case params[settingName] === 0:
-        throw new Error(`ERR_INVALID_${settingName}`);
-      case !(params[settingName] >= 1 && params[settingName] <= 50):
-        throw new Error(`ERR_INVALID_${settingName}`);
-    }
-  };
   [
     "OFFLINE_MODEM_DELETE_CYCLE",
     "HISTORY_DELETE_CYCLE",
@@ -74,24 +59,20 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
         case "TOLLERENCE":
         case "CMTR_CORR":
         case "NMTR_CORR": {
-          // params[settingName] = Number(params[settingName]);
-          // if (isNaN(params[settingName]))
-          //   throw new Error(`ERR_INVALID_${settingName}`);
-          console.log("HITS");
-          isValidParamsSettings(params, settingName);
+          params[settingName] = Number(params[settingName]);
+          if (isNaN(params[settingName]))
+            throw new Error(`ERR_INVALID_${settingName}`);
           break;
         }
         case "DISABLE_NOTIFICATION_VAL":
         case "SHOW_HIDE_REGISTER_VAL":
         case "ENABLE_AUTO_GEOCODE": {
-          // params[settingName] = Number(params[settingName]);
-          // if (
-          //   isNaN(params[settingName]) ||
-          //   !(params[settingName] === 1 || params[settingName] === 0)
-          // )
-          //   throw new Error(`ERR_INVALID_${settingName}`);
-          console.log("HITS---");
-          isValidParamsSettings(params, settingName);
+          params[settingName] = Number(params[settingName]);
+          if (
+            isNaN(params[settingName]) ||
+            !(params[settingName] === 1 || params[settingName] === 0)
+          )
+            throw new Error(`ERR_INVALID_${settingName}`);
           break;
         }
 
@@ -102,7 +83,6 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
             !(params[settingName] >= 1 && params[settingName] <= 50)
           )
             throw new Error(`ERR_INVALID_${settingName}`);
-
           break;
         }
 
