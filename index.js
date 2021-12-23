@@ -181,4 +181,6 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
       }
     }
   });
+
+  return [generalSettingConfigs, previousFields, changedFields];
 };
