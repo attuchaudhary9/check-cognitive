@@ -10,6 +10,7 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
       throw new Error(`ERR_INVALID_${settingName}`);
     }
   };
+
   const historyDeleteCycleParamsCheck = (paramsSetting, settingName) => {
     const historicalDeleteCycleDays = [
       7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105,
@@ -19,25 +20,76 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
       throw new Error(`ERR_INVALID_${settingName}`);
     }
   };
+
   const loginAttamptParamsCheck = (paramsSetting, settingName) => {
     paramsSetting = Number(paramsSetting);
     if (isNaN(paramsSetting)) throw new Error(`ERR_INVALID_${settingName}`);
   };
+
   const disableNotificationValParamsCheck = (paramsSetting, settingName) => {
     paramsSetting = Number(paramsSetting);
     if (isNaN(paramsSetting) || !(paramsSetting === 1 || paramsSetting === 0))
       throw new Error(`ERR_INVALID_${settingName}`);
   };
+
   const maxBirthCertificateParamsCheck = (paramsSetting, settingName) => {
     paramsSetting = Number(paramsSetting);
     if (isNaN(paramsSetting) || !(paramsSetting >= 1 && paramsSetting <= 50))
       throw new Error(`ERR_INVALID_${settingName}`);
   };
+
   const vTDRSensitivityParamsCheck = (paramsSetting, settingName) => {
     paramsSetting = Number(paramsSetting);
     if (isNaN(paramsSetting) || !(paramsSetting >= -40 && paramsSetting <= -15))
       throw new Error(`ERR_INVALID_${settingName}`);
   };
+
+  const maxUsrxpwrParamsCheck = (paramsSetting, settingName) => {
+    paramsSetting = Number(paramsSetting);
+    if (
+      isNaN(paramsSetting) ||
+      !(paramsSetting >= -1000 && paramsSetting <= 1000)
+    )
+      throw new Error(`ERR_INVALID_${settingName}`);
+  };
+
+  const lengthUnitParamsCheck = (paramsSetting, settingName) => {
+    paramsSetting = Number(paramsSetting);
+
+    if (
+      isNaN(paramsSetting) ||
+      !(paramsSetting === 1 || paramsSetting === 3.28)
+    ) {
+      throw new Error(`ERR_INVALID_${settingName}`);
+    }
+  };
+
+  const modemFixesRadiusCheck = (paramsSetting, settingName) => {
+    const validModemFixRadius = [10, 50, 100, 500, 1000];
+    paramsSetting = Number(paramsSetting);
+    if (isNaN(paramsSetting) || !validModemFixRadius.includes(paramsSetting))
+      throw new Error(`ERR_INVALID_${settingName}`);
+  };
+
+  const correlationFixesRadiusCheck = (paramsSetting, settingName) => {
+    const validCorrFixRadius = [50, 100, 500, 1000, 2000, 5000];
+    paramsSetting = Number(paramsSetting);
+    if (isNaN(paramsSetting) || !validCorrFixRadius.includes(paramsSetting))
+      throw new Error(`ERR_INVALID_${settingName}`);
+  };
+
+  const pnmMaxCmtsCpuUtilizationCheck = (paramsSetting, settingName) => {
+    paramsSetting = Number(paramsSetting);
+    if (isNaN(paramsSetting) || !(paramsSetting < 100 && paramsSetting > 1))
+      throw new Error(`ERR_INVALID_${settingName}`);
+  };
+
+  const pnmRepollWaitTimeCheck = (paramsSetting, settingName) => {
+    paramsSetting = Number(paramsSetting);
+    if (isNaN(paramsSetting) || !(paramsSetting < 1320 && paramsSetting > 1))
+      throw new Error(`ERR_INVALID_${settingName}`);
+  };
+
   [
     "OFFLINE_MODEM_DELETE_CYCLE",
     "HISTORY_DELETE_CYCLE",
@@ -107,61 +159,27 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
         }
         case "MAX_usrxpwr":
         case "MIN_usrxpwr": {
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !(params[settingName] >= -1000 && params[settingName] <= 1000)
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
+          maxUsrxpwrParamsCheck(params[settingName], settingName);
           break;
         }
         case "LENGTH_UNIT": {
-          params[settingName] = Number(params[settingName]);
-
-          if (
-            isNaN(params[settingName]) ||
-            !(params[settingName] === 1 || params[settingName] === 3.28)
-          ) {
-            throw new Error(`ERR_INVALID_${settingName}`);
-          }
+          lengthUnitParamsCheck(params[settingName], settingName);
           break;
         }
         case "MODEM_FIXES_RADIUS": {
-          const validModemFixRadius = [10, 50, 100, 500, 1000];
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !validModemFixRadius.includes(params[settingName])
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
+          modemFixesRadiusCheck(params[settingName], settingName);
           break;
         }
         case "CORRELATION_FIXES_RADIUS": {
-          const validCorrFixRadius = [50, 100, 500, 1000, 2000, 5000];
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !validCorrFixRadius.includes(params[settingName])
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
+          correlationFixesRadiusCheck(params[settingName], settingName);
           break;
         }
         case "PNM_MAX_CMTS_CPU_UTILIZATION": {
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !(params[settingName] < 100 && params[settingName] > 1)
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
+          pnmMaxCmtsCpuUtilizationCheck(params[settingName], settingName);
           break;
         }
         case "PNM_REPOLL_WAIT_TIME": {
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !(params[settingName] < 1320 && params[settingName] > 1)
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
+          pnmRepollWaitTimeCheck(params[settingName], settingName);
           break;
         }
       }
