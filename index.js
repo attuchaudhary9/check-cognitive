@@ -2,10 +2,41 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
   const previousFields = [];
   const changedFields = [];
   const generalSettingConfigs = [];
-  const isValidParamsSettings = (params, settingName) => {
-    params = Number(params);
-    console.log("PARAMS", params);
-    if (isNaN(params)) throw new Error(`ERR_INVALID_${settingName}`);
+
+  const offlineModemDelCycleParamsCheck = (paramsSetting, settingName) => {
+    const offLineModemCycleDays = [3, 7, 10, 14];
+    paramsSetting = Number(paramsSetting);
+    if (!offLineModemCycleDays.includes(paramsSetting)) {
+      throw new Error(`ERR_INVALID_${settingName}`);
+    }
+  };
+  const historyDeleteCycleParamsCheck = (paramsSetting, settingName) => {
+    const historicalDeleteCycleDays = [
+      7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105,
+    ];
+    paramsSetting = Number(paramsSetting);
+    if (!historicalDeleteCycleDays.includes(paramsSetting)) {
+      throw new Error(`ERR_INVALID_${settingName}`);
+    }
+  };
+  const loginAttamptParamsCheck = (paramsSetting, settingName) => {
+    paramsSetting = Number(paramsSetting);
+    if (isNaN(paramsSetting)) throw new Error(`ERR_INVALID_${settingName}`);
+  };
+  const disableNotificationValParamsCheck = (paramsSetting, settingName) => {
+    paramsSetting = Number(paramsSetting);
+    if (isNaN(paramsSetting) || !(paramsSetting === 1 || paramsSetting === 0))
+      throw new Error(`ERR_INVALID_${settingName}`);
+  };
+  const maxBirthCertificateParamsCheck = (paramsSetting, settingName) => {
+    paramsSetting = Number(paramsSetting);
+    if (isNaN(paramsSetting) || !(paramsSetting >= 1 && paramsSetting <= 50))
+      throw new Error(`ERR_INVALID_${settingName}`);
+  };
+  const vTDRSensitivityParamsCheck = (paramsSetting, settingName) => {
+    paramsSetting = Number(paramsSetting);
+    if (isNaN(paramsSetting) || !(paramsSetting >= -40 && paramsSetting <= -15))
+      throw new Error(`ERR_INVALID_${settingName}`);
   };
   [
     "OFFLINE_MODEM_DELETE_CYCLE",
@@ -37,22 +68,12 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
     ) {
       switch (settingName) {
         case "OFFLINE_MODEM_DELETE_CYCLE": {
-          const offLineModemCycleDays = [3, 7, 10, 14];
-          params[settingName] = Number(params[settingName]);
-          if (!offLineModemCycleDays.includes(params[settingName])) {
-            throw new Error(`ERR_INVALID_${settingName}`);
-          }
+          offlineModemDelCycleParamsCheck(params[settingName], settingName);
           break;
         }
 
         case "HISTORY_DELETE_CYCLE": {
-          const historicalDeleteCycleDays = [
-            7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105,
-          ];
-          params[settingName] = Number(params[settingName]);
-          if (!historicalDeleteCycleDays.includes(params[settingName])) {
-            throw new Error(`ERR_INVALID_${settingName}`);
-          }
+          historyDeleteCycleParamsCheck(params[settingName], settingName);
           break;
         }
 
@@ -64,38 +85,23 @@ const sanitizeGeneralSettingConfigs = (params, siteConstantsConfig) => {
         case "TOLLERENCE":
         case "CMTR_CORR":
         case "NMTR_CORR": {
-          isValidParamsSettings(params[settingName], settingName);
+          loginAttamptParamsCheck(params[settingName], settingName);
           break;
         }
         case "DISABLE_NOTIFICATION_VAL":
         case "SHOW_HIDE_REGISTER_VAL":
         case "ENABLE_AUTO_GEOCODE": {
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !(params[settingName] === 1 || params[settingName] === 0)
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
+          disableNotificationValParamsCheck(params[settingName], settingName);
           break;
         }
 
         case "MAX_BIRTH_CERTIFICATE": {
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !(params[settingName] >= 1 && params[settingName] <= 50)
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
+          maxBirthCertificateParamsCheck(params[settingName], settingName);
           break;
         }
 
         case "vTDR_SENSITIVITY": {
-          params[settingName] = Number(params[settingName]);
-          if (
-            isNaN(params[settingName]) ||
-            !(params[settingName] >= -40 && params[settingName] <= -15)
-          )
-            throw new Error(`ERR_INVALID_${settingName}`);
+          vTDRSensitivityParamsCheck(params[settingName], settingName);
 
           break;
         }
