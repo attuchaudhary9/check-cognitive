@@ -24,20 +24,20 @@ const extractStrategicData = async (params) => {
             secretAccessKey: decryptedSecretKey
           });
 
-          for (const csvFileName of result) {
-            try {
-              const filePath = `${process.cwd()}/data_extraction/${csvFileName}`;
-              if (Util.commonUtils.doesFileExists(filePath)) {
-                const key = `data_extraction/${csvFileName}`;
-                // eslint-disable-next-line no-await-in-loop
-                await Util.commonUtils.uploadFileToS3(S3, key, bucketName, filePath, csvFileName);
-                isAnyFileSaved = true;
-              }
-            } catch (error) {
-              Logger.error(`Error while uploading csv for table ${csvFileName} on bucket ${bucketName}`);
-              Logger.error(error);
+         result.map(csvFileName => {
+          try {
+            const filePath = `${process.cwd()}/data_extraction/${csvFileName}`;
+            if (Util.commonUtils.doesFileExists(filePath)) {
+              const key = `data_extraction/${csvFileName}`;
+              // eslint-disable-next-line no-await-in-loop
+              await Util.commonUtils.uploadFileToS3(S3, key, bucketName, filePath, csvFileName);
+              isAnyFileSaved = true;
             }
+          } catch (error) {
+            Logger.error(`Error while uploading csv for table ${csvFileName} on bucket ${bucketName}`);
+            Logger.error(error);
           }
+         })
         }
       })
     }
