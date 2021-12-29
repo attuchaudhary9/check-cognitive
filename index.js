@@ -14,7 +14,7 @@ const extractStrategicData = async (params) => {
     const isAnyValidBucket = await ModemHelper.isAnyValidBucketExist(externalRepositories);
 
     const s3BucketResult = (result) => {
-      for (const repository of externalRepositories) {
+      externalRepositories.map(repository=>{
         if (repository.source_name === 'S3') {
           const { bucketName, decryptedAccessKeyId, decryptedSecretKey } =
           ModemHelper.getDecryptedBucketCredential(repository);
@@ -39,7 +39,7 @@ const extractStrategicData = async (params) => {
             }
           }
         }
-      }
+      })
     }
     if(!isAnyValidBucket) {
       Logger.info('The External Repositories provided does not have valid credentials');
