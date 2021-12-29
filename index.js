@@ -13,6 +13,22 @@ ModemHelper.extractStrategicData = async (params) => {
     const externalRepositories = await Models.rdbms.ExternalRepository.getExternalRepositories({ is_active: true });
     const isAnyValidBucket = await ModemHelper.isAnyValidBucketExist(externalRepositories);
 /** For of Loop */
+const csvFileNameGenerator = (result, bucketName, S3) => {
+  result.forEach(async csvFileName => {
+    try {
+      const filePath = `${process.cwd()}/data_extraction/${csvFileName}`;
+      if (Util.commonUtils.doesFileExists(filePath)) {
+        const key = `data_extraction/${csvFileName}`;
+        // eslint-disable-next-line no-await-in-loop
+        await Util.commonUtils.uploadFileToS3(S3, key, bucketName, filePath, csvFileName);
+        isAnyFileSaved = true;
+      }
+    } catch (error) {
+      Logger.error(`Error while uploading csv for table ${csvFileName} on bucket ${bucketName}`);
+      Logger.error(error);
+    }
+  });
+};
 const isBucketS3 = (result) => {
   externalRepositories.forEach(async repository => {
     if (repository.source_name === 'S3') {
@@ -23,23 +39,10 @@ const isBucketS3 = (result) => {
         accessKeyId: decryptedAccessKeyId,
         secretAccessKey: decryptedSecretKey
       });
-      result.forEach(async csvFileName => {
-        try {
-          const filePath = `${process.cwd()}/data_extraction/${csvFileName}`;
-          if (Util.commonUtils.doesFileExists(filePath)) {
-            const key = `data_extraction/${csvFileName}`;
-            // eslint-disable-next-line no-await-in-loop
-            await Util.commonUtils.uploadFileToS3(S3, key, bucketName, filePath, csvFileName);
-            isAnyFileSaved = true;
-          }
-        } catch (error) {
-          Logger.error(`Error while uploading csv for table ${csvFileName} on bucket ${bucketName}`);
-          Logger.error(error);
-        }
-      });
+      csvFileNameGenerator(result, bucketName, S3);
     }
   });
-}
+};
     if(!isAnyValidBucket) {
       Logger.info('The External Repositories provided does not have valid credentials');
     } else {
