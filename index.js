@@ -14,7 +14,7 @@ const extractStrategicData = async (params) => {
     const isAnyValidBucket = await ModemHelper.isAnyValidBucketExist(externalRepositories);
 
     const s3BucketResult = (result) => {
-      externalRepositories.map(repository=>{
+      for (const repository of externalRepositories) {
         if (repository.source_name === 'S3') {
           const { bucketName, decryptedAccessKeyId, decryptedSecretKey } =
           ModemHelper.getDecryptedBucketCredential(repository);
@@ -24,22 +24,22 @@ const extractStrategicData = async (params) => {
             secretAccessKey: decryptedSecretKey
           });
 
-         result.map(csvFileName => {
-          try {
-            const filePath = `${process.cwd()}/data_extraction/${csvFileName}`;
-            if (Util.commonUtils.doesFileExists(filePath)) {
-              const key = `data_extraction/${csvFileName}`;
-              // eslint-disable-next-line no-await-in-loop
-              await Util.commonUtils.uploadFileToS3(S3, key, bucketName, filePath, csvFileName);
-              isAnyFileSaved = true;
+          for (const csvFileName of result) {
+            try {
+              const filePath = `${process.cwd()}/data_extraction/${csvFileName}`;
+              if (Util.commonUtils.doesFileExists(filePath)) {
+                const key = `data_extraction/${csvFileName}`;
+                // eslint-disable-next-line no-await-in-loop
+                await Util.commonUtils.uploadFileToS3(S3, key, bucketName, filePath, csvFileName);
+                isAnyFileSaved = true;
+              }
+            } catch (error) {
+              Logger.error(`Error while uploading csv for table ${csvFileName} on bucket ${bucketName}`);
+              Logger.error(error);
             }
-          } catch (error) {
-            Logger.error(`Error while uploading csv for table ${csvFileName} on bucket ${bucketName}`);
-            Logger.error(error);
           }
-         })
         }
-      })
+      }
     }
     if(!isAnyValidBucket) {
       Logger.info('The External Repositories provided does not have valid credentials');
