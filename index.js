@@ -13,15 +13,19 @@ ModemHelper.extractStrategicData = async (params) => {
     const externalRepositories = await Models.rdbms.ExternalRepository.getExternalRepositories({ is_active: true });
     const isAnyValidBucket = await ModemHelper.isAnyValidBucketExist(externalRepositories);
 /** For of Loop */
+const s3Genrator = (decryptedAccessKeyId, decryptedSecretKey) => {
+  const S3 = new AWS.S3({
+    accessKeyId: decryptedAccessKeyId,
+    secretAccessKey: decryptedSecretKey
+  });
+  return S3;
+}
 const repositorySourceNameCheck = () => {
   if (repository.source_name === 'S3') {
     const { bucketName, decryptedAccessKeyId, decryptedSecretKey } =
     ModemHelper.getDecryptedBucketCredential(repository);
 
-    const S3 = new AWS.S3({
-      accessKeyId: decryptedAccessKeyId,
-      secretAccessKey: decryptedSecretKey
-    });
+  const S3 = s3Genrator(decryptedAccessKeyId, decryptedSecretKey);
     csvFileNameGenerator(result, bucketName, S3);
   }
 }
