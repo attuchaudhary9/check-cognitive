@@ -64,7 +64,8 @@ ModemHelper.loopExternalRepositories = (externalRepositories,result ,isAnyFileSa
             const key = `data_extraction/${csvFileName}`;
             // eslint-disable-next-line no-await-in-loop
             await Util.commonUtils.uploadFileToS3(S3, key, bucketName, filePath, csvFileName);
-            // isAnyFileSaved = true;
+            isAnyFileSaved = true;
+            return isAnyFileSaved;
           }
         } catch (error) {
           Logger.error(`Error while uploading csv for table ${csvFileName} on bucket ${bucketName}`);
