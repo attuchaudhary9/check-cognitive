@@ -5,8 +5,12 @@ UsersHelper.createUserWidgetSettingResponse = async (userData) => {
   resultData.widget_sequence = userData.UserSetting.widget_sequence;
   resultData.user_widget_preference = userData.UserSetting.user_widget_preference;
 
-  UsersHelper.isEmptyCheckForUserWidgetResponse(modules, resultData.widget_sequence, resultData.user_widget_preference);
+let[modulesAfterCheck,widgetSequence,widgetPreference] =  UsersHelper.isEmptyCheckForUserWidgetResponse(modules, resultData.widget_sequence, resultData.user_widget_preference);
 
+  modules = modulesAfterCheck;
+  resultData.widget_sequence = widgetSequence;
+  resultData.user_widget_preference = widgetPreference;
+  
   modules = JSON.parse(modules);
 
   const widgets = await UsersRepository.getWidgets();
@@ -113,4 +117,5 @@ UsersHelper.isEmptyCheckForUserWidgetResponse = async (modules, resultDataWidget
   if (Util.commonUtils.isEmpty(resultDataUserWidgetPref)) {
     resultDataUserWidgetPref = await Models.rdbms.UserSetting.getDefaultUserWidgetPreferenceSetting();
   }
+  return [modules, resultDataWidgetSequence,resultDataUserWidgetPref]
 };
