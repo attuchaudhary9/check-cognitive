@@ -1,21 +1,14 @@
-const createUserWidgetSettingResponse = async (userData) => {
+
+UsersHelper.createUserWidgetSettingResponse = async (userData) => {
   const resultData = {};
   let modules = await Helpers.cacheHelper.get('MODULES');
-  if (Util.commonUtils.isEmpty(modules)) {
-    await Models.rdbms.Module.loadModules();
-    modules = await Helpers.cacheHelper.get('MODULES');
-  }
+  resultData.widget_sequence = userData.UserSetting.widget_sequence;
+  resultData.user_widget_preference = userData.UserSetting.user_widget_preference;
+
+  UsersHelper.isEmptyCheckForUserWidgetResponse(modules, resultData.widget_sequence, resultData.user_widget_preference);
+
   modules = JSON.parse(modules);
 
-  resultData.widget_sequence = userData.UserSetting.widget_sequence;
-  if (Util.commonUtils.isEmpty(resultData.widget_sequence)) {
-    resultData.widget_sequence = await Models.rdbms.UserSetting.getDefaultWidgetSequenceSetting();
-  }
-
-  resultData.user_widget_preference = userData.UserSetting.user_widget_preference;
-  if (Util.commonUtils.isEmpty(resultData.user_widget_preference)) {
-    resultData.user_widget_preference = await Models.rdbms.UserSetting.getDefaultUserWidgetPreferenceSetting();
-  }
   const widgets = await UsersRepository.getWidgets();
   const leftPanelActive = [];
   const leftPanelInactive = [];
@@ -107,4 +100,17 @@ const createUserWidgetSettingResponse = async (userData) => {
   }
   resultData.widget_sequence.right_panel = resultData.widget_sequence.right_panel.toString();
   return resultData;
+};
+
+UsersHelper.isEmptyCheckForUserWidgetResponse = async (modules, resultDataWidgetSequence, resultDataUserWidgetPref) => {
+  if (Util.commonUtils.isEmpty(modules)) {
+    await Models.rdbms.Module.loadModules();
+    modules = await Helpers.cacheHelper.get('MODULES');
+  }
+  if (Util.commonUtils.isEmpty(resultDataWidgetSequence)) {
+    resultDataWidgetSequence = await Models.rdbms.UserSetting.getDefaultWidgetSequenceSetting();
+  }
+  if (Util.commonUtils.isEmpty(resultDataUserWidgetPref)) {
+    resultDataUserWidgetPref = await Models.rdbms.UserSetting.getDefaultUserWidgetPreferenceSetting();
+  }
 };
