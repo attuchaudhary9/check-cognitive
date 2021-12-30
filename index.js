@@ -31,7 +31,7 @@ ModemHelper.extractStrategicData = async (params) => {
       }
 
       if (result.length) {
-        ModemHelper.loopExternalRepositories(externalRepositories,result);
+        ModemHelper.loopExternalRepositories(externalRepositories,result ,isAnyFileSaved);
       }
     }
   } catch (error) {
@@ -45,7 +45,7 @@ ModemHelper.extractStrategicData = async (params) => {
 };
 
 
-ModemHelper.loopExternalRepositories = (externalRepositories,result) => {
+ModemHelper.loopExternalRepositories = (externalRepositories,result ,isAnyFileSaved) => {
   for (const repository of externalRepositories) {
     if (repository.source_name === 'S3') {
       const { bucketName, decryptedAccessKeyId, decryptedSecretKey } =
