@@ -1,3 +1,4 @@
+
 UsersHelper.createUserWidgetSettingResponse = async (userData) => {
   let resultData = {};
   let modules = await Helpers.cacheHelper.get('MODULES');
@@ -35,34 +36,8 @@ UsersHelper.createUserWidgetSettingResponse = async (userData) => {
 
   resultData.widget_sequence.left_panel =  resultData.widget_sequence.left_panel.toString();
 
-  rightPanelActive.forEach(widgetName => {
-    /* If any widget is newly added widget, by default show that
-    widget to every user until they update the settings for that widget */
-    if (!(widgetName in resultData.user_widget_preference)) {
-      /* For every new widget added in future, will need to add setting here
-      for existing users */
-
-      if(['left_panel', 'search', 'fbc_correlation_list', 'rxmer_correlation_list'].includes(widgetName)){
-        resultData.user_widget_preference[widgetName] = { is_visible: true };
-        if (['fbc_correlation_list', 'rxmer_correlation_list'].includes(widgetName)) {
-          resultData.widget_sequence.right_panel = resultData.widget_sequence.right_panel + ',' + widgetName;
-        }
-      } else {
-        resultData.user_widget_preference[widgetName] = { is_visible: false };
-      }
-    } else {
-      if(
-        resultData.user_widget_preference[widgetName].is_visible
-        &&
-        !(resultData.widget_sequence.right_panel.includes(widgetName))
-      ) {
-        if(!['left_panel', 'search'].includes(widgetName)){
-          resultData.user_widget_preference[widgetName].is_visible = false;
-        }
-      }
-    }
-
-  });
+  const resultRightActive = UsersHelper.rightPanelActiveResult(rightPanelActive, resultData);
+  resultData = resultRightActive;
 
   leftPanelActive.forEach(widgetName => {
     if (!(resultData.widget_sequence.left_panel.includes(widgetName))) {
@@ -124,6 +99,38 @@ UsersHelper.removeLPanelInActiceW = (leftPanelInactive, resultData) => {
     if (indexOf >= 0) {
       resultDataP.widget_sequence.left_panel.splice(indexOf, 1);
     }
+  });
+  return resultDataP;
+};
+UsersHelper.rightPanelActiveResult = (rightPanelActive, resultData) => {
+  let resultDataP = resultData;
+  rightPanelActive.forEach(widgetName => {
+    /* If any widget is newly added widget, by default show that
+    widget to every user until they update the settings for that widget */
+    if (!(widgetName in resultDataP.user_widget_preference)) {
+      /* For every new widget added in future, will need to add setting here
+      for existing users */
+
+      if(['left_panel', 'search', 'fbc_correlation_list', 'rxmer_correlation_list'].includes(widgetName)){
+        resultDataP.user_widget_preference[widgetName] = { is_visible: true };
+        if (['fbc_correlation_list', 'rxmer_correlation_list'].includes(widgetName)) {
+          resultDataP.widget_sequence.right_panel = resultDataP.widget_sequence.right_panel + ',' + widgetName;
+        }
+      } else {
+        resultDataP.user_widget_preference[widgetName] = { is_visible: false };
+      }
+    } else {
+      if(
+        resultDataP.user_widget_preference[widgetName].is_visible
+        &&
+        !(resultDataP.widget_sequence.right_panel.includes(widgetName))
+      ) {
+        if(!['left_panel', 'search'].includes(widgetName)){
+          resultDataP.user_widget_preference[widgetName].is_visible = false;
+        }
+      }
+    }
+
   });
   return resultDataP;
 };
