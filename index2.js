@@ -1,6 +1,5 @@
-
 UsersHelper.createUserWidgetSettingResponse = async (userData) => {
-  const resultData = {};
+  let resultData = {};
   let modules = await Helpers.cacheHelper.get('MODULES');
   if (Util.commonUtils.isEmpty(modules)) {
     await Models.rdbms.Module.loadModules();
@@ -19,26 +18,21 @@ UsersHelper.createUserWidgetSettingResponse = async (userData) => {
   }
   const widgets = await UsersRepository.getWidgets();
   const [leftPanelActive, leftPanelInactive, rightPanelActive, rightPanelInactive ] =  UsersHelper.isPanelActiveOrNot(widgets);
-  resultData.widget_sequence.right_panel = resultData.widget_sequence.right_panel.split(',');
 
   //Removing all the inactive right Panel widget data from final response
-  rightPanelInactive.forEach(widgetName => {
-    delete resultData.user_widget_preference[widgetName];
-    const indexOf = resultData.widget_sequence.right_panel.indexOf(widgetName);
-    if (indexOf >= 0) {
-      resultData.widget_sequence.right_panel.splice(indexOf, 1);
-    }
-  });
+  resultData.widget_sequence.right_panel = resultData.widget_sequence.right_panel.split(',');
+
+  const rPanelResult =  UsersHelper.removeRPanelInactiveW(rightPanelInactive, resultData);
+  resultData = rPanelResult;
+
   resultData.widget_sequence.right_panel = resultData.widget_sequence.right_panel.toString();
 
   //Removing all the inactive left Panel widget data from final response
   resultData.widget_sequence.left_panel = resultData.widget_sequence.left_panel.split(',');
-  leftPanelInactive.forEach(widgetName => {
-    const indexOf = resultData.widget_sequence.left_panel.indexOf(widgetName);
-    if (indexOf >= 0) {
-      resultData.widget_sequence.left_panel.splice(indexOf, 1);
-    }
-  });
+
+  const lPanelResult = UsersHelper.removeLPanelInActiceW(leftPanelInactive, resultData);
+  resultData = lPanelResult;
+
   resultData.widget_sequence.left_panel =  resultData.widget_sequence.left_panel.toString();
 
   rightPanelActive.forEach(widgetName => {
@@ -111,4 +105,25 @@ UsersHelper.isPanelActiveOrNot = (widgets) => {
     }
   });
 return [leftPanelActive, leftPanelInactive, rightPanelActive, rightPanelInactive];
+};
+UsersHelper.removeRPanelInactiveW = (rightPanelInactive, resultData) => {
+  let resultDataP = resultData;
+  rightPanelInactive.forEach(widgetName => {
+    delete resultDataP.user_widget_preference[widgetName];
+    const indexOf = resultDataP.widget_sequence.right_panel.indexOf(widgetName);
+    if (indexOf >= 0) {
+      resultDataP.widget_sequence.right_panel.splice(indexOf, 1);
+    }
+  });
+  return resultDataP;
+};
+UsersHelper.removeLPanelInActiceW = (leftPanelInactive, resultData) => {
+  let resultDataP = resultData;
+  leftPanelInactive.forEach(widgetName => {
+    const indexOf = resultDataP.widget_sequence.left_panel.indexOf(widgetName);
+    if (indexOf >= 0) {
+      resultDataP.widget_sequence.left_panel.splice(indexOf, 1);
+    }
+  });
+  return resultDataP;
 };
