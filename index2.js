@@ -5,35 +5,17 @@ UsersHelper.createUserWidgetSettingResponse = async (userData) => {
   resultData.widget_sequence = userData.UserSetting.widget_sequence;
   resultData.user_widget_preference = userData.UserSetting.user_widget_preference;
 
-let[modulesAfterCheck,widgetSequence,widgetPreference] =  UsersHelper.isEmptyCheckForUserWidgetResponse(modules, resultData.widget_sequence, resultData.user_widget_preference);
+  const [moduleCheck, wiSeqCheck, wiPrefCheck] =  UsersHelper.isEmptyCheckForUserWidgetResponse(modules, resultData.widget_sequence, resultData.user_widget_preference);
 
-  modules = modulesAfterCheck;
-  resultData.widget_sequence = widgetSequence;
-  resultData.user_widget_preference = widgetPreference;
-  
+  modules = moduleCheck;
   modules = JSON.parse(modules);
 
-  const widgets = await UsersRepository.getWidgets();
-  const leftPanelActive = [];
-  const leftPanelInactive = [];
-  const rightPanelActive = [];
-  const rightPanelInactive = [];
+  resultData.widget_sequence = wiSeqCheck;
+  resultData.user_widget_preference = wiPrefCheck;
 
-  widgets.forEach(widget => {
-    if(widget.is_active) {
-      if (widget.is_card) {
-        leftPanelActive.push(widget.name);
-      } else {
-        rightPanelActive.push(widget.name);
-      }
-    } else {
-      if (widget.is_card) {
-        leftPanelInactive.push(widget.name);
-      } else {
-        rightPanelInactive.push(widget.name);
-      }
-    }
-  });
+  const widgets = await UsersRepository.getWidgets();
+
+  const [leftPanelActive, leftPanelInactive, rightPanelActive, rightPanelInactive] = UsersHelper.isPanelActiveOrInactiveCheck(widgets);
 
   resultData.widget_sequence.right_panel = resultData.widget_sequence.right_panel.split(',');
 
@@ -117,5 +99,29 @@ UsersHelper.isEmptyCheckForUserWidgetResponse = async (modules, resultDataWidget
   if (Util.commonUtils.isEmpty(resultDataUserWidgetPref)) {
     resultDataUserWidgetPref = await Models.rdbms.UserSetting.getDefaultUserWidgetPreferenceSetting();
   }
-  return [modules, resultDataWidgetSequence,resultDataUserWidgetPref]
+  return [modules, resultDataWidgetSequence, resultDataUserWidgetPref];
+};
+
+UsersHelper.isPanelActiveOrInactiveCheck = (widgets) => {
+  const leftPanelActive = [];
+  const leftPanelInactive = [];
+  const rightPanelActive = [];
+  const rightPanelInactive = [];
+
+  widgets.forEach(widget => {
+    if(widget.is_active) {
+      if (widget.is_card) {
+        leftPanelActive.push(widget.name);
+      } else {
+        rightPanelActive.push(widget.name);
+      }
+    } else {
+      if (widget.is_card) {
+        leftPanelInactive.push(widget.name);
+      } else {
+        rightPanelInactive.push(widget.name);
+      }
+    }
+  });
+  return [leftPanelActive, leftPanelInactive, rightPanelActive, rightPanelInactive] ;
 };

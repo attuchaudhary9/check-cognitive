@@ -1,9 +1,10 @@
-let modules = 'hello';
+let modules = [];
 
 function helloWorld(m){
- return m+'world';
+  m.push('hello world')
+  return m;
 }
-const val = helloWorld(modules)
+const [val] = helloWorld(modules)
 modules = val;
 
 console.log(modules);
